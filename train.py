@@ -1,5 +1,6 @@
 import os
 import csv
+import time
 from util import read_from_csv,process_video_data,load_data,init_weight,plot_metrics
 import torch
 from model import AlexNet
@@ -81,6 +82,7 @@ def main():
     #训练
     train_len=len(train_iter.dataset)
     test_len = len(test_iter.dataset)
+    print(test_len)
     all_train_acc, all_train_loss = [], []
     all_test_acc, all_test_loss = [], []
 
@@ -88,6 +90,7 @@ def main():
     best_epoch = 0
     shape = None
 
+    start_time = time.time()
     for epoch in range(epochs):
         model.train()
         epoch_loss = 0
@@ -142,6 +145,8 @@ def main():
             annotate_last=False,
             epoch=epoch+1
         )
+    end_time = time.time()
+    total_time = end_time - start_time
 
     # === 保存 CSV ===
     df = pd.DataFrame({
@@ -173,9 +178,11 @@ def main():
         # ✅ 最优结果
         f.write(f"最优模型出现在第 {best_epoch} 轮\n")
         f.write(f"最优测试损失（Best Test Loss）: {best_test_loss:.4f}\n")
+        f.write(f"⏱️ 总训练时间: {total_time:.2f} 秒\n")
         f.write("====================\n")
 
     print(f"\n🎉 训练完成！结果保存于：{log_path}")
+
 
 if __name__ == "__main__":
     main()
